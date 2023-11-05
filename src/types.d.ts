@@ -15,3 +15,8 @@ type ProjectThumbnail = {
   programYear: number;
   skills: string[];
 };
+
+type GraphData = {
+  programYear: number;
+  count: number;
+};

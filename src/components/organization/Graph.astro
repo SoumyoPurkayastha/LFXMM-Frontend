@@ -1,0 +1,85 @@
+---
+interface Props {
+  id: number;
+  graphData: JSON;
+}
+const { id, graphData } = Astro.props;
+
+const API_BASE_URL = import.meta.env.API_BASE_URL;
+---
+
+<div id="curve_chart"></div>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"
+></script>
+
+<script type="text/javascript" define:vars={{ graphData }}>
+  function parseResponseToArray(graphData) {
+    const parsedRes = [["Year", "Proposals"]];
+    graphData.map((res) => {
+      const temp = [];
+      temp.push(String(res.programYear));
+      temp.push(res.count);
+
+      parsedRes.push(temp);
+    });
+
+    return parsedRes;
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+
+  google.charts.setOnLoadCallback(() => drawChart(graphData));
+
+  function drawChart(response) {
+    const parsedResponse = parseResponseToArray(response);
+    console.log(parsedResponse);
+    var data = google.visualization.arrayToDataTable(parsedResponse);
+
+    var options = {
+      titleTextStyle: {
+        color: "white",
+        fontSize: 16,
+      },
+      curveType: "function",
+      legend: { position: "bottom" },
+      backgroundColor: "transparent",
+      legend: {
+        position: "bottom",
+        textStyle: {
+          color: "white", // Set the legend text color to white
+        },
+      },
+      vAxis: {
+        textStyle: {
+          color: "white",
+          fontSize: 12,
+        },
+        gridlines: {
+          color: "white", // Set the color of the vertical gridlines
+        },
+      },
+      hAxis: {
+        textStyle: {
+          color: "white",
+          fontSize: 12,
+        },
+        gridlines: {
+          color: "transparent", // Set the color of the vertical gridlines
+          count: 0,
+        },
+      },
+      series: {
+        0: { lineWidth: 2, pointSize: 5, color: "white" }, // Adjust line width and point size as needed
+      },
+      width: "100%",
+      height: "100%",
+    };
+
+    var chart = new google.visualization.LineChart(
+      document.getElementById("curve_chart"),
+    );
+
+    chart.draw(data, options);
+  }
+</script>

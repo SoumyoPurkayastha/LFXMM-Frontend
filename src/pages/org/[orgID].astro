@@ -3,6 +3,7 @@ export const prerender = true;
 
 import Layout from "../../layouts/Layout.astro";
 import { ProjectNavbar } from "../../components/organization/ProjectNavbar";
+import Graph from "../../components/organization/Graph.astro";
 
 // Get all the organization IDs and render the page for them
 export async function getStaticPaths() {
@@ -26,6 +27,9 @@ const orgData = await orgResponse.json();
 
 const projectResponse = await fetch(`${API_BASE_URL}/orgs/${orgID}/projects/`);
 const projectData = (await projectResponse.json()).projects;
+
+const graphResponse = await fetch(`${API_BASE_URL}/orgs/${orgID}/count/`);
+const graphData = await graphResponse.json();
 ---
 
 <Layout title={orgData.org}>
@@ -40,99 +44,103 @@ const projectData = (await projectResponse.json()).projects;
       </div>
 
       <div class="orgInfo">
-        <div>
-          <p class="text-white text-md max-w-xl">
+        <div class="orgDesc">
+          <p class="text-fade-grey text-md max-w-xl">
             {orgData.desc}
           </p>
         </div>
-        <div class="graph">Display the Graph</div>
+        <div class="graph">
+          <Graph id={orgData.id} graphData={graphData} />
+        </div>
       </div>
-    </div>
 
-    <div class="relative">
-      <h1
-        class="text-white text-center text-5xl font-semibold pt-[180px] pb-[50px]"
-      >
-        Past Projects
-      </h1>
-      <div class="codeBlock absolute"></div>
+      <div class:"pastYears">
+        <h1
+          class="text-white text-center text-5xl font-semibold pt-[180px] pb-[50px]"
+        >
+          Past Projects
+        </h1>
+      </div>
+      <ProjectNavbar allProjects={projectData} client:only="react" />
     </div>
-    <ProjectNavbar allProjects={projectData} client:only="react" />
   </div>
+
+  <style is:global>
+    body {
+      background: #00101b;
+    }
+
+    .mainPage {
+      color: white;
+      height: fit-content;
+      padding: 0vh 8vw;
+    }
+
+    .upperSection {
+      margin-top: 20vh;
+      flex-direction: column;
+      height: 70vh;
+      margin-bottom: 20vh;
+    }
+
+    .orgInfo {
+      width: 100%;
+      display: flex;
+    }
+
+    .orgDesc {
+      padding: 15px;
+    }
+
+    .orgLogo {
+      height: 15vh;
+      margin: 0vh 0vw 10vh 0vw;
+    }
+
+    .graph {
+      width: 250px;
+      height: 36%;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pastYears {
+      width: 100%;
+      justify-content: center;
+      font-family: Lato;
+      font-size: 60px;
+      font-weight: 700;
+      line-height: 72px;
+      letter-spacing: 0em;
+      margin-bottom: 6vh;
+      color: white;
+    }
+
+    .lowerSection {
+      width: 100%;
+      padding: 0vh 1vw;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2vh;
+      justify-content: center;
+      background-color: rgb(16, 16, 16);
+    }
+    .codeBlock {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      left: calc(50% - 150px / 2 - 78px);
+      top: calc(50% - 150.05px / 2 - 47.47px);
+      border-radius: 100%;
+      background: linear-gradient(
+        118.19deg,
+        #02101a -3.62%,
+        hsl(210, 94%, 21%) 55.44%,
+        #0077cc 110.51%
+      );
+      opacity: 0.2;
+      filter: blur(34px);
+      transform: matrix(1, 0, -0.03, 1, 0, 0);
+    }
+  </style>
 </Layout>
-
-<style is:global>
-  body {
-    background: #00101b;
-  }
-
-  .mainPage {
-    color: white;
-    height: fit-content;
-    padding: 0vh 8vw;
-  }
-
-  .upperSection {
-    margin-top: 20vh;
-    display: flex;
-    flex-direction: column;
-    height: 70vh;
-  }
-
-  .orgInfo {
-    width: 100%;
-    display: flex;
-  }
-
-  .orgLogo {
-    height: 15vh;
-    margin: 0vh 0vw 10vh 0vw;
-  }
-
-  .graph {
-    display: flex;
-    width: 40%;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .pastYears {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    font-family: Lato;
-    font-size: 60px;
-    font-weight: 700;
-    line-height: 72px;
-    letter-spacing: 0em;
-    margin-bottom: 6vh;
-    color: white;
-  }
-
-  .lowerSection {
-    width: 100%;
-    padding: 0vh 1vw;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2vh;
-    justify-content: center;
-    background-color: rgb(16, 16, 16);
-  }
-  .codeBlock {
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    left: calc(50% - 150px / 2 - 78px);
-    top: calc(50% - 150.05px / 2 - 47.47px);
-    border-radius: 100%;
-    background: linear-gradient(
-      118.19deg,
-      #02101a -3.62%,
-      hsl(210, 94%, 21%) 55.44%,
-      #0077cc 110.51%
-    );
-    opacity: 0.2;
-    filter: blur(34px);
-    transform: matrix(1, 0, -0.03, 1, 0, 0);
-  }
-</style>
